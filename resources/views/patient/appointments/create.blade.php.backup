@@ -1,0 +1,359 @@
+{{-- resources/views/patient/appointments/create.blade.php --}}
+@extends('layouts.dashboard')
+
+@section('title', 'Book Appointment')
+@section('page-title', 'Book New Appointment')
+
+@section('content')
+<div class="max-w-3xl mx-auto">
+    <div class="bg-white rounded-xl shadow-sm p-8">
+        <!-- Progress Steps -->
+        <div class="flex items-center justify-center mb-10">
+            <div class="flex items-center w-full max-w-sm">
+                <div class="w-10 h-10 rounded-full gradient-bg text-white flex items-center justify-center font-bold"
+                     :class="step >= 1 ? 'gradient-bg' : 'bg-gray-300'">1</div>
+                <div class="flex-1 h-1 mx-2" :class="step >= 2 ? 'gradient-bg' : 'bg-gray-300'"></div>
+                <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold"
+                     :class="step >= 2 ? 'gradient-bg text-white' : 'bg-gray-300 text-gray-600'">2</div>
+                <div class="flex-1 h-1 mx-2" :class="step >= 3 ? 'gradient-bg' : 'bg-gray-300'"></div>
+                <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold"
+                     :class="step >= 3 ? 'gradient-bg text-white' : 'bg-gray-300 text-gray-600'">3</div>
+            </div>
+        </div>
+
+        <form method="POST" action="{{ route('patient.appointments.store') }}" x-data="appointmentForm()" class="space-y-6">
+            @csrf
+
+            <!-- Step 1: Select Doctor -->
+            <div x-show="step === 1" x-cloak>
+                <h3 class="text-lg font-semibold text-gray-800 mb-6">
+                    <i class="fas fa-user-md text-indigo-600 mr-2"></i>Select a Doctor
+                </h3>
+
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-3">Department</label>
+                    <select x-model="department" @change="filterDoctors()"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        <option value="">All Departments</option>
+                        @foreach($departments as $dept)
+                            <option value="{{ $dept->id }}">{{ $dept->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-3">Choose Doctor</label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="doctors-list">
+                        @foreach($doctors as $doctor)
+                            <label class="cursor-pointer group doctor-option" data-department="{{ $doctor->department_id }}">
+                                <input type="radio" name="doctor_id" value="{{ $doctor->id }}"
+                                       x-model="selectedDoctor" class="hidden">
+                                <div class="flex items-center p-4 border-2 rounded-lg smooth-transition group-hover:border-indigo-300 group-hover:bg-indigo-50"
+                                     :class="selectedDoctor == '{{ $doctor->id }}' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-300'"
+                                     @click="updateDoctorName('{{ $doctor->id }}', '{{ addslashes($doctor->user->name) }}')">
+                                    <div class="w-14 h-14 gradient-bg rounded-full flex items-center justify-center text-white mr-4 flex-shrink-0">
+                                        <i class="fas fa-user-md text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-800">Dr. {{ $doctor->user->name }}</h4>
+                                        <p class="text-sm text-gray-600">{{ $doctor->specialization }}</p>
+                                        <p class="text-sm text-indigo-600 font-medium">₹{{ number_format($doctor->consultation_fee) }}</p>
+                                    </div>
+                                </div>
+                            </label>
+                        @endforeach
+                    </div>
+                    @error('doctor_id')
+                        <p class="mt-2 text-sm text-red-600"><i class="fas fa-exclamation-circle mr-1"></i>{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="flex justify-end">
+                    <button type="button" @click="nextStep()" :disabled="!selectedDoctor"
+                            class="px-6 py-3 gradient-bg text-white rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg smooth-transition">
+                        Next <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 2: Select Date & Time -->
+            <div x-show="step === 2" x-cloak>
+                <h3 class="text-lg font-semibold text-gray-800 mb-6">
+                    <i class="fas fa-calendar text-indigo-600 mr-2"></i>Select Date & Time
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Appointment Date</label>
+                        <input type="date" name="appointment_date" x-model="appointmentDate"
+                               min="{{ date('Y-m-d') }}"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        @error('appointment_date')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Appointment Time</label>
+                        <select name="appointment_time" x-model="appointmentTime"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                            <option value="">Select Time</option>
+                            <option value="09:00">09:00 AM</option>
+                            <option value="09:30">09:30 AM</option>
+                            <option value="10:00">10:00 AM</option>
+                            <option value="10:30">10:30 AM</option>
+                            <option value="11:00">11:00 AM</option>
+                            <option value="11:30">11:30 AM</option>
+                            <option value="14:00">02:00 PM</option>
+                            <option value="14:30">02:30 PM</option>
+                            <option value="15:00">03:00 PM</option>
+                            <option value="15:30">03:30 PM</option>
+                            <option value="16:00">04:00 PM</option>
+                            <option value="16:30">04:30 PM</option>
+                        </select>
+                        @error('appointment_time')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="flex gap-3 justify-between">
+                    <button type="button" @click="prevStep()"
+                            class="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 smooth-transition">
+                        <i class="fas fa-arrow-left mr-2"></i>Back
+                    </button>
+                    <button type="button" @click="nextStep()" :disabled="!appointmentDate || !appointmentTime"
+                            class="px-6 py-3 gradient-bg text-white rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg smooth-transition">
+                        Next <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 3: Review & Submit -->
+            <div x-show="step === 3" x-cloak>
+                <h3 class="text-lg font-semibold text-gray-800 mb-6">
+                    <i class="fas fa-check-circle text-indigo-600 mr-2"></i>Review Your Appointment
+                </h3>
+
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-sm text-gray-600">Doctor</p>
+                                <p class="text-lg font-semibold text-gray-800" x-text="selectedDoctorName || 'Not selected'"></p>
+                            </div>
+                            <button type="button" @click="step = 1" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">Change</button>
+                        </div>
+                        <hr class="border-blue-200">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-sm text-gray-600">Date & Time</p>
+                                <p class="text-lg font-semibold text-gray-800" x-text="formatDateTime()"></p>
+                            </div>
+                            <button type="button" @click="step = 2" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">Change</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Symptoms/Reason for Visit</label>
+                    <textarea name="symptoms" rows="4" placeholder="Please describe your symptoms or reason for the appointment"
+                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" required></textarea>
+                    @error('symptoms')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Additional Notes (Optional)</label>
+                    <textarea name="patient_note" rows="2" placeholder="Any additional information for the doctor"
+                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"></textarea>
+                </div>
+
+                <div class="flex gap-3 justify-between">
+                    <button type="button" @click="prevStep()"
+                            class="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 smooth-transition">
+                        <i class="fas fa-arrow-left mr-2"></i>Back
+                    </button>
+                    <button type="submit" class="px-6 py-3 gradient-bg text-white rounded-lg font-semibold hover:shadow-lg smooth-transition">
+                        <i class="fas fa-check mr-2"></i>Confirm Appointment
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+function appointmentForm() {
+    return {
+        step: 1,
+        department: '',
+        selectedDoctor: '',
+        selectedDoctorName: '',
+        appointmentDate: '',
+        appointmentTime: '',
+
+        nextStep() {
+            if (this.step < 3) {
+                this.step++;
+            }
+        },
+
+        prevStep() {
+            if (this.step > 1) {
+                this.step--;
+            }
+        },
+
+        updateDoctorName(doctorId, doctorName) {
+            this.selectedDoctor = doctorId;
+            this.selectedDoctorName = doctorName;
+        },
+
+        filterDoctors() {
+            const options = document.querySelectorAll('.doctor-option');
+            options.forEach(option => {
+                if (!this.department || option.dataset.department === this.department) {
+                    option.style.display = 'block';
+                } else {
+                    option.style.display = 'none';
+                }
+            });
+        },
+
+        formatDateTime() {
+            if (!this.appointmentDate || !this.appointmentTime) return 'Not selected';
+            const date = new Date(this.appointmentDate + ' ' + this.appointmentTime);
+            return date.toLocaleDateString() + ' at ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+    }
+}
+</script>
+@endpush
+@endsection
+                            <option value="11:00">11:00 AM</option>
+                            <option value="11:30">11:30 AM</option>
+                            <option value="14:00">02:00 PM</option>
+                            <option value="14:30">02:30 PM</option>
+                            <option value="15:00">03:00 PM</option>
+                            <option value="15:30">03:30 PM</option>
+                            <option value="16:00">04:00 PM</option>
+                            <option value="16:30">04:30 PM</option>
+                        </select>
+                        @error('appointment_time')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+                
+                <div class="flex justify-between">
+                    <button type="button" @click="step = 1" class="px-6 py-3 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50">
+                        <i class="fas fa-arrow-left mr-2"></i> Back
+                    </button>
+                    <button type="button" @click="step = 3" :disabled="!appointmentDate || !appointmentTime"
+                            class="px-6 py-3 gradient-bg text-white rounded-lg font-medium disabled:opacity-50">
+                        Next <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Step 3: Symptoms & Confirmation -->
+            <div x-show="step === 3" x-cloak>
+                <h3 class="text-lg font-semibold text-gray-800 mb-6">Describe Your Symptoms</h3>
+                
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Symptoms / Reason for Visit</label>
+                    <textarea name="symptoms" rows="4" required
+                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                              placeholder="Please describe your symptoms or reason for visiting the doctor..."></textarea>
+                    @error('symptoms')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Additional Notes (Optional)</label>
+                    <textarea name="patient_note" rows="2"
+                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
+                              placeholder="Any additional information for the doctor..."></textarea>
+                </div>
+                
+                <!-- Summary -->
+                <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                    <h4 class="font-medium text-gray-800 mb-3">Appointment Summary</h4>
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <span class="text-gray-500">Date:</span>
+                            <span class="text-gray-800 ml-2" x-text="appointmentDate"></span>
+                        </div>
+                        <div>
+                            <span class="text-gray-500">Time:</span>
+                            <span class="text-gray-800 ml-2" x-text="appointmentTime"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-between">
+                    <button type="button" @click="step = 2" class="px-6 py-3 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50">
+                        <i class="fas fa-arrow-left mr-2"></i> Back
+                    </button>
+                    <button type="submit" class="px-6 py-3 gradient-bg text-white rounded-lg font-medium">
+                        <i class="fas fa-check mr-2"></i> Confirm Booking
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+function appointmentForm() {
+    return {
+        step: 1,
+        department: '',
+        selectedDoctor: '',
+        selectedDoctorName: '',
+        appointmentDate: '',
+        appointmentTime: '',
+
+        nextStep() {
+            if (this.step < 3) {
+                this.step++;
+            }
+        },
+
+        prevStep() {
+            if (this.step > 1) {
+                this.step--;
+            }
+        },
+
+        updateDoctorName(doctorId, doctorName) {
+            this.selectedDoctor = doctorId;
+            this.selectedDoctorName = doctorName;
+        },
+
+        filterDoctors() {
+            const options = document.querySelectorAll('.doctor-option');
+            options.forEach(option => {
+                if (!this.department || option.dataset.department === this.department) {
+                    option.style.display = 'block';
+                } else {
+                    option.style.display = 'none';
+                }
+            });
+        },
+
+        formatDateTime() {
+            if (!this.appointmentDate || !this.appointmentTime) return 'Not selected';
+            const date = new Date(this.appointmentDate + ' ' + this.appointmentTime);
+            return date.toLocaleDateString() + ' at ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+    }
+}
+</script>
+@endpush
+@endsection
