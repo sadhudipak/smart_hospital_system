@@ -164,19 +164,3 @@
     </div>
 </section>
 @endsection
-                <i class="fa fa-check"></i>
-                <h3>Reports</h3>
-                <h1>8</h1>
-            </div>
-        </div>
-    </div>
-
-</div>
-
-<!-- FOOTER -->
-<footer>
-    © 2026 SmartHospital | All Rights Reserved
-</footer>
-
-</body>
-</html>

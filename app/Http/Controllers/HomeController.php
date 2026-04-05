@@ -44,9 +44,14 @@ class HomeController extends Controller
 
     public function doctors()
     {
-        $doctors = Doctor::with(['user', 'department'])
-            ->whereHas('user', fn($q) => $q->where('is_active', true))
-            ->paginate(12);
+        $query = Doctor::with(['user', 'department'])
+            ->whereHas('user', fn($q) => $q->where('is_active', true));
+
+        if (request('department')) {
+            $query->where('department_id', request('department'));
+        }
+
+        $doctors = $query->paginate(12);
         $departments = Department::where('is_active', true)->get();
         
         return view('pages.doctors', compact('doctors', 'departments'));

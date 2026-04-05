@@ -30,7 +30,7 @@ class DoctorController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
             'phone' => 'required|string|max:20',
-            'password' => 'required|string|min:8',
+            'password' => 'required|string|min:8|confirmed',
             'department_id' => 'required|exists:departments,id',
             'specialization' => 'required|string|max:255',
             'qualification' => 'required|string|max:255',
@@ -119,10 +119,22 @@ class DoctorController extends Controller
             ->with('success', 'Doctor updated successfully!');
     }
 
+    public function show(Doctor $doctor)
+    {
+        $doctor->load(['user', 'department']);
+        return view('admin.doctors.show', compact('doctor'));
+    }
+
     public function destroy(Doctor $doctor)
     {
-        $doctor->user->delete(); // Cascades to doctor record
-        
+        DB::transaction(function () use ($doctor) {
+            if ($doctor->user) {
+                $doctor->user->delete();
+            } else {
+                $doctor->delete();
+            }
+        });
+
         return redirect()->route('admin.doctors.index')
             ->with('success', 'Doctor deleted successfully!');
     }

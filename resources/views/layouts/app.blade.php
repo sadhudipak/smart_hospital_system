@@ -6,27 +6,13 @@
     <title>@yield('title', 'Smart Hospital')</title>
     <meta name="description" content="Smart Hospital - Quality Healthcare Services">
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {}
-            }
-        }
-    </script>
+    <!-- Compiled CSS -->
+    @vite('resources/css/app.css')
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
     
     <style>
-        .gradient-bg {
-            @apply bg-gradient-to-r from-indigo-600 to-indigo-700;
-        }
-        .smooth-transition {
-            @apply transition-all duration-300 ease-in-out;
-        }
         [x-cloak] { display: none !important; }
     </style>
 </head>
@@ -46,5 +32,8 @@
     
     <!-- Alpine.js for interactivity -->
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    
+    <!-- Compiled JS -->
+    @vite('resources/js/app.js')
 </body>
 </html>

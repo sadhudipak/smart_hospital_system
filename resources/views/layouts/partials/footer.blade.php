@@ -48,7 +48,6 @@
                     <li><a href="#" class="text-gray-400 hover:text-indigo-400 smooth-transition flex items-center space-x-2"><i class="fas fa-chevron-right text-xs w-3"></i><span>Book Appointment</span></a></li>
                     <li><a href="#" class="text-gray-400 hover:text-indigo-400 smooth-transition flex items-center space-x-2"><i class="fas fa-chevron-right text-xs w-3"></i><span>Prescriptions</span></a></li>
                     <li><a href="#" class="text-gray-400 hover:text-indigo-400 smooth-transition flex items-center space-x-2"><i class="fas fa-chevron-right text-xs w-3"></i><span>Health Records</span></a></li>
-                    <li><a href="#" class="text-gray-400 hover:text-indigo-400 smooth-transition flex items-center space-x-2"><i class="fas fa-chevron-right text-xs w-3"></i><span>Reports</span></a></li>
                 </ul>
             </div>
             
@@ -80,7 +79,6 @@
         <div class="border-t border-gray-800 pt-8">
             <!-- Bottom Section -->
             <div class="flex flex-col md:flex-row items-center justify-between text-sm text-gray-400">
-                <p>&copy; {{ date('Y') }} SmartHospital. All rights reserved.</p>
                 <div class="flex space-x-6 mt-4 md:mt-0">
                     <a href="#" class="hover:text-indigo-400 smooth-transition">Privacy Policy</a>
                     <a href="#" class="hover:text-indigo-400 smooth-transition">Terms of Service</a>

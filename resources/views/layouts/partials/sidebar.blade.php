@@ -33,10 +33,6 @@
                         <i class="fas fa-calendar-alt w-5 text-center"></i>
                         <span>Appointments</span>
                     </a>
-                    <a href="{{ route('admin.reports') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg smooth-transition {{ request()->routeIs('admin.reports') ? 'bg-indigo-600 text-white' : 'text-gray-300 hover:bg-gray-800' }}">
-                        <i class="fas fa-file-chart-line w-5 text-center"></i>
-                        <span>Reports</span>
-                    </a>
                 </div>
             @endif
             

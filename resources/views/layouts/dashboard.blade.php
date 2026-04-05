@@ -5,27 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Dashboard')</title>
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {}
-            }
-        }
-    </script>
+    <!-- Compiled CSS -->
+    @vite('resources/css/app.css')
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
     
     <style>
-        .gradient-bg {
-            @apply bg-gradient-to-r from-indigo-600 to-indigo-700;
-        }
-        .smooth-transition {
-            @apply transition-all duration-300 ease-in-out;
-        }
         [x-cloak] { display: none !important; }
 
         /* Custom scrollbar */
@@ -49,34 +35,12 @@
                 position: fixed;
                 top: 0;
                 left: 0;
-                width: 100%;
-                height: 100%;
+                right: 0;
+                bottom: 0;
                 background: rgba(0, 0, 0, 0.5);
-                z-index: 30;
+                z-index: 40;
             }
         }
-
-        /* Line clamp utilities */
-        .line-clamp-1 {
-            overflow: hidden;
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
-            -webkit-line-clamp: 1;
-        }
-        .line-clamp-2 {
-            overflow: hidden;
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
-            -webkit-line-clamp: 2;
-        }
-        .line-clamp-3 {
-            overflow: hidden;
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
-            -webkit-line-clamp: 3;
-        }
-
-        /* Additional responsive utilities */
         .xs\:inline {
             display: none;
         }
@@ -150,5 +114,8 @@
             });
         });
     </script>
+    
+    <!-- Compiled JS -->
+    @vite('resources/js/app.js')
 </body>
 </html>

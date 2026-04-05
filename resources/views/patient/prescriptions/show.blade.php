@@ -149,11 +149,3 @@
     </div>
 </div>
 @endsection
-                        </div>
-                    </div>
-                </div>
-            @endif
-        </div>
-    </div>
-</div>
-@endsection

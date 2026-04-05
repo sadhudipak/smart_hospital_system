@@ -42,8 +42,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/patients', [AdminPatientController::class, 'index'])->name('patients.index');
     Route::get('/patients/{patient}', [AdminPatientController::class, 'show'])->name('patients.show');
     
-    // Appointment Reports
+    // Appointment Management
     Route::get('/appointments', [AdminAppointmentController::class, 'index'])->name('appointments.index');
+    Route::get('/appointments/{appointment}', [AdminAppointmentController::class, 'show'])->name('appointments.show');
     Route::get('/reports', [AdminAppointmentController::class, 'reports'])->name('reports');
 });
 
